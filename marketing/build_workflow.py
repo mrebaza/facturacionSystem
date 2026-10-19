@@ -51,8 +51,10 @@ const config = {
   telegramChatId: '8534772721',
   // Mismo renderizador de videos que ya tienes desplegado; la marca Al Toque va en cada pedido.
   rendererUrl: 'https://ma-renderer.vercel.app',
-  // 'gemini' = gratis (nivel gratuito de Google, unas 20 peticiones diarias) · 'claude' = de pago, mejor redacción.
-  aiProvider: 'gemini',
+  // 'nvidia' = gratis (modelos Nemotron en build.nvidia.com) · 'gemini' = gratis (Google AI Studio)
+  // · 'claude' = de pago, mejor redacción. Con 1 o 2 pedidos al día, los dos gratis alcanzan de sobra.
+  aiProvider: 'nvidia',
+  nvidiaModel: 'nvidia/nemotron-3-super-120b-a12b',
   geminiModel: 'gemini-flash-latest',
   claudeModel: 'claude-opus-5-5',
   instagramUserId: 'PON_AQUI_EL_ID_DE_INSTAGRAM_DE_AL_TOQUE',
@@ -191,10 +193,30 @@ const gemini = {
     generationConfig: { responseMimeType: 'application/json', responseJsonSchema: withoutExtras(SCHEMA), temperature: 0.9 },
   },
 };
-return [{ json: { config, request: config.aiProvider === 'claude' ? claude : gemini } }];
+// NVIDIA usa el formato de OpenAI: el esquema va dentro de las instrucciones y la respuesta se valida al leerla.
+const nvidia = {
+  url: 'https://integrate.api.nvidia.com/v1/chat/completions',
+  version: '',
+  beta: '',
+  body: {
+    model: config.nvidiaModel,
+    messages: [
+      { role: 'system', content: `${SYSTEM}
+
+El JSON debe cumplir este esquema:
+${JSON.stringify(SCHEMA)}` },
+      { role: 'user', content: request },
+    ],
+    temperature: 0.8,
+    max_tokens: 8192,
+    chat_template_kwargs: { enable_thinking: false },
+  },
+};
+const requests = { claude, gemini, nvidia };
+return [{ json: { config, request: requests[config.aiProvider] ?? gemini } }];
 """
 
-READ_SCRIPT_JS = r"""// Lee el JSON que devolvió la IA (Gemini o Claude) y recuerda el tema para no repetirlo.
+READ_SCRIPT_JS = r"""// Lee el JSON que devolvió la IA (NVIDIA, Gemini o Claude) y recuerda el tema para no repetirlo.
 const response = $input.first().json;
 const config = $('Preparar pedido a la IA').first().json.config;
 let text;
@@ -202,14 +224,22 @@ if (config.aiProvider === 'claude') {
   if (response.stop_reason === 'refusal') throw new Error('Claude rechazó el pedido: ' + JSON.stringify(response.stop_details));
   if (response.stop_reason === 'max_tokens') throw new Error('La respuesta de Claude se cortó (max_tokens).');
   text = (response.content ?? []).find((block) => block.type === 'text')?.text;
+} else if (config.aiProvider === 'nvidia') {
+  const choice = response.choices?.[0];
+  if (!choice) throw new Error('NVIDIA no devolvió respuesta: ' + JSON.stringify(response).slice(0, 300));
+  if (choice.finish_reason === 'length') throw new Error('La respuesta de NVIDIA se cortó (max_tokens).');
+  text = choice.message?.content ?? '';
 } else {
   const candidate = response.candidates?.[0];
   if (!candidate) throw new Error('Gemini no devolvió respuesta: ' + JSON.stringify(response.promptFeedback ?? response).slice(0, 300));
   if (candidate.finishReason && candidate.finishReason !== 'STOP') throw new Error('Gemini terminó con ' + candidate.finishReason);
   text = (candidate.content?.parts ?? []).map((part) => part.text ?? '').join('');
 }
-const script = JSON.parse(text);
+// Algunos modelos envuelven el JSON en ```json … ``` o dejan su razonamiento antes: se toma solo el objeto.
+const json = String(text ?? '').replace(/<think>[\s\S]*?<\/think>/g, '');
+const script = JSON.parse(json.slice(json.indexOf('{'), json.lastIndexOf('}') + 1));
 if (!Array.isArray(script.scenes) || script.scenes.length < 3) throw new Error('El guion no tiene escenas suficientes.');
+if (!script.captions?.instagram || !script.scenes.some((scene) => scene.type === 'cta')) throw new Error('Al guion le faltan los textos o el cierre.');
 const store = $getWorkflowStaticData('global');
 store.recentTopics = [...(store.recentTopics ?? []), script.topic].slice(-30);
 return [{ json: { config, script } }];
@@ -338,7 +368,8 @@ if_node('¿Es lunes?', '={{ $json.enviarReporte }}', 'true', [1360, -260])
 link('Aprender de los resultados', '¿Es lunes?')
 telegram_message('Reporte semanal', '={{ $json.reporte }}', [1560, -260])
 link('¿Es lunes?', 'Reporte semanal', out=0)
-# La credencial «Clave de IA» lleva la cabecera de la clave: x-goog-api-key (Gemini) o x-api-key (Claude).
+# La credencial «Clave de IA» lleva la cabecera de la clave: Authorization: Bearer nvapi-… (NVIDIA),
+# x-goog-api-key (Gemini) o x-api-key (Claude).
 http('La IA escribe el guion', 'POST', '={{ $json.request.url }}', [900, 100], cred=AI_KEY,
      headers={'anthropic-version': '={{ $json.request.version }}', 'anthropic-beta': '={{ $json.request.beta }}'},
      body='={{ JSON.stringify($json.request.body) }}', timeout=600000, retryOnFail=True, maxTries=3, waitBetweenTries=15000)

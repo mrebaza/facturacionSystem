@@ -1,6 +1,6 @@
 # Publicidad automática de Al Toque
 
-Un video vertical por día para Instagram, Facebook y TikTok, escrito por IA, renderizado con la marca Al Toque
+Un video vertical por día para Instagram, Facebook y TikTok, escrito por IA (gratis, con NVIDIA), renderizado con la marca Al Toque
 y publicado solo después de que lo apruebes desde Telegram.
 
 ```
@@ -51,14 +51,44 @@ La IA no puede inventar testimonios, clientes, cifras ni normas: el guionista so
 
 ## Ponerlo en marcha (una sola vez)
 
-1. En tu n8n: **Workflows › Import from file** → `n8n-video-diario.json`.
-2. Crea estas credenciales (los nodos ya las buscan por nombre):
-   - **Clave de IA** (Header Auth): `x-goog-api-key` con una clave gratis de Google AI Studio, o `x-api-key` de Anthropic si en *Configuración* pones `aiProvider: 'claude'`.
-   - **Renderizador M&A** (Header Auth): name `Authorization`, value `Bearer <RENDER_TOKEN>`; el token está en Dokploy › ma-company-contenido › ma-renderer › Environment.
-   - **Telegram Al Toque**: un bot nuevo creado con @BotFather.
-   - **Meta Al Toque (token de página)** (Query Auth): `access_token` = token de larga duración de la página de Facebook de Al Toque (con su Instagram profesional vinculado).
-3. En el nodo **Configuración** pon tu `telegramChatId`, el `instagramUserId` y el `facebookPageId`.
-4. Toca **Probar ahora**. Cuando te llegue el video a Telegram y te guste, activa el flujo.
+El flujo ya está importado en n8n (apagado) con la IA de NVIDIA. Faltan 3 credenciales; los nodos las buscan por nombre.
+
+### 1. IA gratis de NVIDIA → credencial «Clave de IA»
+1. Crea tu cuenta en **build.nvidia.com** (NVIDIA Developer Program, gratis) y genera una API key (`nvapi-…`).
+2. En n8n: **Credentials › Add › Header Auth**, nombre **Clave de IA**, Name `Authorization`, Value `Bearer nvapi-…`.
+
+Usa `nvidia/nemotron-3-super-120b-a12b` en las GPUs de NVIDIA, sin costo y sin cargar el servidor. El nivel gratis
+es para prototipos (unas 40 peticiones por minuto; el flujo hace 1 o 2 al día). Si algún día se acaba, en *Configuración*
+cambia `aiProvider` a `'gemini'` y la credencial a `x-goog-api-key` con una clave gratis de Google AI Studio.
+
+> ¿Modelo local? El servidor tiene 1 núcleo y ~1,6 GB libres, sin GPU: un modelo de 4B no cabe y uno de 1B escribe mal
+> en español y frenaría a los demás sistemas. Si algún día hay un VPS con 8 GB libres, `aiProvider: 'nvidia'` funciona
+> también contra Ollama (cambia la URL a `http://ollama:11434/v1/chat/completions`), porque usa el mismo formato.
+
+### 2. Renderizador → credencial «Renderizador M&A»
+Header Auth, Name `Authorization`, Value `Bearer <RENDER_TOKEN>` (Dokploy › ma-company-contenido › ma-renderer › Environment).
+
+### 3. Facebook e Instagram → credencial «Meta Al Toque (token de página)»
+1. Crea la **página de Facebook** de Al Toque y una cuenta de **Instagram profesional** (Empresa o Creador).
+   En Instagram › Configuración › Centro de cuentas, vincúlala a la página.
+2. En **developers.facebook.com** › Mis apps › Crear app › tipo **Empresa**. Agrega el producto
+   **Instagram › API con inicio de sesión de Facebook**. Copia el *App ID* y la *App Secret* (Configuración › Básica).
+   La app puede quedarse en modo desarrollo: como eres administrador, publica en tus propias cuentas sin revisión de Meta.
+3. Abre el **Explorador de la API Graph**, elige tu app, *Obtener token de acceso de usuario* y marca:
+   `pages_show_list`, `pages_read_engagement`, `pages_manage_posts`, `instagram_basic`,
+   `instagram_content_publish`, `instagram_manage_insights` (y `business_management` si la página está en un portfolio comercial).
+   Al aceptar, elige la página y el Instagram de Al Toque.
+4. Pega App ID, App Secret y el token en `Desktop\claves-al-toque.txt` y ejecuta en **tu** PowerShell:
+   ```
+   python marketing\conectar_meta.py "$env:USERPROFILE\Desktop\claves-al-toque.txt"
+   ```
+   Muestra el id de la página y del Instagram, y deja en el portapapeles un token de página **que no vence**.
+5. En n8n: **Query Auth**, nombre **Meta Al Toque (token de página)**, Name `access_token`, Value: Ctrl+V.
+6. Pon los dos ids en el nodo **Configuración** (`instagramUserId`, `facebookPageId`) y borra el archivo de claves.
+
+### 4. Probar
+Abre cada nodo en rojo y elige su credencial si n8n no la tomó sola. Toca **Probar ahora**: en ~8 minutos te llega
+el video a Telegram. Si te gusta, **✅ Publicar** y activa el flujo.
 
 TikTok y LinkedIn quedan como nodos desactivados hasta que esas redes aprueben la app (igual que en M&A).
 

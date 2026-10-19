@@ -6,7 +6,7 @@ Sistema de facturación electrónica SUNAT y punto de venta para bodegas, ferret
 y estudios contables: boletas, facturas, notas de crédito y débito, anulaciones, detracciones, crédito con cuotas,
 caja con Yape/Plin, inventario con kardex y varios negocios por cuenta.
 
-**En línea:** https://altoque-pe.vercel.app · demo `demo@altoque.pe` / `altoque123` (SUNAT de pruebas)
+**En línea:** https://altoquepe.site · demo `demo@altoque.pe` / `altoque123` (SUNAT de pruebas)
 
 | Parte | Tecnología |
 |---|---|
@@ -183,7 +183,7 @@ Proyecto `altoque` en Dokploy:
 | `altoque-api` | `backend/` (Dockerfile). Volumen `altoque-archivos` en `/data/archivos` (XML y CDR: respáldalo). |
 | `altoque-web` | `frontend/` (nginx). `API_UPSTREAM=http://<app de la API>:8080`. |
 
-HTTPS: proxy en Vercel (`altoque-pe.vercel.app`) que reenvía al dominio interno de la web.
+HTTPS: proxy en Vercel (proyecto `altoque-pe`) que reenvía al dominio interno de la web. Dominio `altoquepe.site` (Hostinger): A `@` → 216.198.79.1, CNAME `www` → dc6b4db4b979f6cd.vercel-dns-017.com.
 
 Variables de la API: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `JWT_SECRET`, `APP_CRYPTO_KEY`, `FRONTEND_URL`,
 `API_PUBLIC_URL`, `CORS_ORIGINS`, `ARCHIVOS_DIR`; opcionales `APIPERU_TOKEN` (DNI/RUC), `MP_ACCESS_TOKEN` (cobro de planes), `ALTOQUE_DEMO`.

@@ -35,7 +35,7 @@ No inventes clientes, testimonios, premios, cifras de ventas ni porcentajes de a
 - Duración total de 25 a 40 segundos narrados (unas 70 a 110 palabras en total).
 - La escena 1 es el **gancho**: una pregunta o frase que se entienda en menos de 3 segundos. Máximo 9 palabras en pantalla.
 - De 2 a 4 escenas `point`, cada una con un título de 1 a 3 palabras y un texto en pantalla de máximo 14 palabras.
-- Cierra siempre con una escena `cta`. Alterna entre: «Prueba 15 días gratis: link en la bio», «Escríbenos por WhatsApp y te lo mostramos», «Comenta BOLETA y te pasamos el link», «Síguenos para más trucos de tu negocio».
+- Cierra siempre con una escena `cta`. Alterna entre: «Prueba 15 días gratis en altoquepe.site», «Prueba 15 días gratis: link en la bio», «Escríbenos por WhatsApp y te lo mostramos», «Comenta BOLETA y te pasamos el link», «Síguenos para más trucos de tu negocio».
 - La narración no repite literalmente el texto en pantalla: lo complementa.
 - En la narración escribe los números en palabras («setecientos soles») para que la voz los lea bien; en pantalla usa cifras («S/ 700»).
 - En la narración escribe la marca como «Al Toque»; en pantalla, «Al Toque».

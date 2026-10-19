@@ -48,7 +48,7 @@ altoque:
   # Clave para cifrar la clave SOL y la del certificado (AES-GCM). En producción: APP_CRYPTO_KEY.
   crypto-key: ${APP_CRYPTO_KEY:desarrollo-clave-cifrado-altoque}
   frontend-url: ${FRONTEND_URL:http://localhost:4200}
-  cors-origins: ${CORS_ORIGINS:http://localhost:4200,https://altoque.pe,https://www.altoque.pe}
+  cors-origins: ${CORS_ORIGINS:http://localhost:4200,https://altoquepe.site,https://www.altoquepe.site}
   dias-prueba: ${DIAS_PRUEBA:15}
   # Crea una empresa demo (demo@altoque.pe / altoque123) si no existe.
   demo: ${ALTOQUE_DEMO:true}

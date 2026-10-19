@@ -169,7 +169,7 @@ const DOCS: Record<string, string> = { '0': 'DOC', '1': 'DNI', '4': 'CE', '6': '
           </table>
         </section>
         @if (c.estadoSunat === 'ANULADO') { <div class="sello">ANULADO</div> }
-        <footer class="a4-marca"><at-logo variante="unatinta" [tam]="16" /> <span>Emitido con Al Toque · altoque.pe</span></footer>
+        <footer class="a4-marca"><at-logo variante="unatinta" [tam]="16" /> <span>Emitido con Al Toque · altoquepe.site</span></footer>
       </article>
     }
   `,

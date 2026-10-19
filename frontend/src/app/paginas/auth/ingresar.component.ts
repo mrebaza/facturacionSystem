@@ -18,7 +18,7 @@ import { LogoComponent } from '../../shared/logo.component';
           <h1 class="display">¡Habla,<br />caserito!</h1>
           <p>Entra y sigue facturando al toque. Tus boletas, facturas y el cuadre del día te esperan.</p>
         </div>
-        <span class="mono mini sec">Facturación electrónica SUNAT · altoque.pe</span>
+        <span class="mono mini sec">Facturación electrónica SUNAT · altoquepe.site</span>
       </section>
 
       <section class="lado-form">

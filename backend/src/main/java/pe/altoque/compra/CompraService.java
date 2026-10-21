@@ -89,7 +89,7 @@ public class CompraService {
     @Transactional
     public CompraVista guardar(Sesion s, Long id, CompraRequest r) {
         Compra c = id == null ? new Compra() : compras.findByIdAndEmpresaId(id, s.empresaId())
-                .orElseThrow(() -> ApiException.noEncontrado("Compra"));
+                .orElseThrow(() -> ApiException.noEncontrada("Compra"));
         String proveedor = r.proveedorNumDoc().trim();
         if (!"0".equals(r.proveedorTipoDoc()) && !Catalogos.documentoValido(r.proveedorTipoDoc(), proveedor)) {
             throw ApiException.invalido("6".equals(r.proveedorTipoDoc()) ? "El RUC del proveedor no es válido." : "Revisa el DNI del proveedor.");
@@ -134,12 +134,12 @@ public class CompraService {
 
     @Transactional
     public void eliminar(Sesion s, Long id) {
-        compras.delete(compras.findByIdAndEmpresaId(id, s.empresaId()).orElseThrow(() -> ApiException.noEncontrado("Compra")));
+        compras.delete(compras.findByIdAndEmpresaId(id, s.empresaId()).orElseThrow(() -> ApiException.noEncontrada("Compra")));
     }
 
     @Transactional
     public CompraVista marcarPagada(Sesion s, Long id) {
-        Compra c = compras.findByIdAndEmpresaId(id, s.empresaId()).orElseThrow(() -> ApiException.noEncontrado("Compra"));
+        Compra c = compras.findByIdAndEmpresaId(id, s.empresaId()).orElseThrow(() -> ApiException.noEncontrada("Compra"));
         c.setEstadoPago(Compra.EstadoPago.PAGADO);
         c.setFechaVencimiento(null);
         return vista(c);

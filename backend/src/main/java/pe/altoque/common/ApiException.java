@@ -20,6 +20,11 @@ public class ApiException extends RuntimeException {
         return new ApiException(HttpStatus.NOT_FOUND, que + " no encontrado");
     }
 
+    /** Para sustantivos femeninos: «Cotización no encontrada». */
+    public static ApiException noEncontrada(String que) {
+        return new ApiException(HttpStatus.NOT_FOUND, que + " no encontrada");
+    }
+
     public static ApiException invalido(String mensaje) {
         return new ApiException(HttpStatus.BAD_REQUEST, mensaje);
     }

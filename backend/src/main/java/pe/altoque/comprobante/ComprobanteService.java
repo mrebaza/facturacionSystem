@@ -129,7 +129,7 @@ public class ComprobanteService {
      */
     @Transactional(readOnly = true)
     public Comprobante presupuesto(Long empresaId, List<ItemIn> items) {
-        Empresa empresa = empresas.findById(empresaId).orElseThrow(() -> ApiException.noEncontrado("Empresa"));
+        Empresa empresa = empresas.findById(empresaId).orElseThrow(() -> ApiException.noEncontrada("Empresa"));
         Comprobante c = new Comprobante();
         c.setEmpresa(empresa);
         c.setIgvPorcentaje(empresa.getIgvPorcentaje());
@@ -365,7 +365,7 @@ public class ComprobanteService {
     // ------------------------------------------------------------------ apoyo
 
     private Empresa empresaHabilitada(Long empresaId) {
-        Empresa e = empresas.findWithPlanById(empresaId).orElseThrow(() -> ApiException.noEncontrado("Empresa"));
+        Empresa e = empresas.findWithPlanById(empresaId).orElseThrow(() -> ApiException.noEncontrada("Empresa"));
         if (e.getEstado() == Empresa.Estado.SUSPENDIDA) {
             throw new ApiException(HttpStatus.PAYMENT_REQUIRED, "Tu cuenta está suspendida. Renueva tu plan para seguir emitiendo.");
         }
@@ -387,7 +387,7 @@ public class ComprobanteService {
     private Serie elegirSerie(Sesion s, TipoComprobante tipo, Long serieId, String prefijo) {
         Serie serie;
         if (serieId != null) {
-            serie = series.findByIdAndEmpresaId(serieId, s.empresaId()).orElseThrow(() -> ApiException.noEncontrado("Serie"));
+            serie = series.findByIdAndEmpresaId(serieId, s.empresaId()).orElseThrow(() -> ApiException.noEncontrada("Serie"));
             if (serie.getTipoComprobante() != tipo || !serie.isActivo() || !serie.getSerie().startsWith(prefijo)) {
                 throw ApiException.invalido("La serie elegida no corresponde a este comprobante.");
             }

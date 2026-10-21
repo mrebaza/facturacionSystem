@@ -236,13 +236,13 @@ public class EmpresaController {
     @PreAuthorize("hasAnyRole('PROPIETARIO','ADMINISTRADOR')")
     @Transactional
     public SerieVista activarSerie(@PathVariable Long id, @RequestParam boolean activo) {
-        Serie s = series.findByIdAndEmpresaId(id, Sesion.actual().empresaId()).orElseThrow(() -> ApiException.noEncontrado("Serie"));
+        Serie s = series.findByIdAndEmpresaId(id, Sesion.actual().empresaId()).orElseThrow(() -> ApiException.noEncontrada("Serie"));
         s.setActivo(activo);
         return SerieVista.de(s);
     }
 
     private Empresa empresa() {
-        return empresas.findById(Sesion.actual().empresaId()).orElseThrow(() -> ApiException.noEncontrado("Empresa"));
+        return empresas.findById(Sesion.actual().empresaId()).orElseThrow(() -> ApiException.noEncontrada("Empresa"));
     }
 
     private static String vacio(String s) {

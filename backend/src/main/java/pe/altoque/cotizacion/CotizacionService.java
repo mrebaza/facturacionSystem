@@ -92,7 +92,7 @@ public class CotizacionService {
     @Transactional
     public Vista crear(Sesion s, CotizacionRequest req) {
         // Bloquea la empresa: dos cotizaciones a la vez no toman el mismo número.
-        Empresa empresa = empresas.bloquear(s.empresaId()).orElseThrow(() -> ApiException.noEncontrado("Empresa"));
+        Empresa empresa = empresas.bloquear(s.empresaId()).orElseThrow(() -> ApiException.noEncontrada("Empresa"));
         Cotizacion c = new Cotizacion();
         c.setEmpresa(empresa);
         c.setUsuario(usuarios.getReferenceById(s.usuarioId()));
@@ -156,13 +156,13 @@ public class CotizacionService {
 
     @Transactional(readOnly = true)
     public Vista publica(String token) {
-        return vista(cotizaciones.findByTokenPublico(token).orElseThrow(() -> ApiException.noEncontrado("Cotización")));
+        return vista(cotizaciones.findByTokenPublico(token).orElseThrow(() -> ApiException.noEncontrada("Cotización")));
     }
 
     /** El cliente acepta o rechaza desde su enlace. */
     @Transactional
     public Vista responder(String token, boolean acepta) {
-        Cotizacion c = cotizaciones.findByTokenPublico(token).orElseThrow(() -> ApiException.noEncontrado("Cotización"));
+        Cotizacion c = cotizaciones.findByTokenPublico(token).orElseThrow(() -> ApiException.noEncontrada("Cotización"));
         if (c.getEstado() != Cotizacion.Estado.ABIERTA) {
             throw ApiException.conflicto("Esta cotización ya fue respondida.");
         }
@@ -176,7 +176,7 @@ public class CotizacionService {
     // ------------------------------------------------------------------ apoyo
 
     private Cotizacion buscar(Sesion s, Long id) {
-        return cotizaciones.findByIdAndEmpresaId(id, s.empresaId()).orElseThrow(() -> ApiException.noEncontrado("Cotización"));
+        return cotizaciones.findByIdAndEmpresaId(id, s.empresaId()).orElseThrow(() -> ApiException.noEncontrada("Cotización"));
     }
 
     private void aplicarItems(Cotizacion c, Long empresaId, List<ItemIn> items) {

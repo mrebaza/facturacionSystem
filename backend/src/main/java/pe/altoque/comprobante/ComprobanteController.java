@@ -39,14 +39,16 @@ public class ComprobanteController {
     private final AlmacenArchivos almacen;
     private final EnvioSunatRepository envios;
     private final Catalogos catalogos;
+    private final CorreoComprobante correo;
 
     public ComprobanteController(ComprobanteService service, SunatService sunat, AlmacenArchivos almacen,
-                                 EnvioSunatRepository envios, Catalogos catalogos) {
+                                 EnvioSunatRepository envios, Catalogos catalogos, CorreoComprobante correo) {
         this.service = service;
         this.sunat = sunat;
         this.almacen = almacen;
         this.envios = envios;
         this.catalogos = catalogos;
+        this.correo = correo;
     }
 
     @GetMapping
@@ -72,6 +74,8 @@ public class ComprobanteController {
         Sesion s = Sesion.actual();
         Comprobante c = service.emitir(s, req);
         enviarSinFallar(c.getId());
+        // Si el cliente dejó su correo, le llega al toque; si falla, la venta no se afecta.
+        if (c.getClienteEmail() != null) correo.enviar(s, c.getId(), null);
         return service.vista(s, c.getId());
     }
 
@@ -110,6 +114,14 @@ public class ComprobanteController {
     public List<EnvioSunat> bitacora(@PathVariable Long id) {
         service.buscar(Sesion.actual(), id);
         return envios.findByComprobanteIdOrderByIdDesc(id);
+    }
+
+    public record CorreoRequest(@jakarta.validation.constraints.Email(message = "Correo inválido") String email) {}
+
+    /** Envía (o reenvía) el comprobante al correo del cliente, o a otro que se indique. */
+    @PostMapping("/{id}/correo")
+    public CorreoComprobante.Resultado correo(@PathVariable Long id, @Valid @RequestBody(required = false) CorreoRequest req) {
+        return correo.enviar(Sesion.actual(), id, req == null ? null : req.email());
     }
 
     @GetMapping("/{id}/xml")

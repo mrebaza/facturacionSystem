@@ -52,6 +52,9 @@ export class EmitirComponent {
   protected readonly nombreMetodo = NOMBRE_METODO;
 
   // tipo y serie
+  /** Llegó desde «Nueva cotización»: el botón principal es guardar la cotización. */
+  protected readonly modoCotizacion = inject(ActivatedRoute).snapshot.queryParamMap.get('modo') === 'cotizacion';
+
   protected tipo = signal<'01' | '03'>((inject(ActivatedRoute).snapshot.queryParamMap.get('tipo') as '01' | '03') === '01' ? '01' : '03');
   protected series = signal<Serie[]>([]);
   protected serieId = signal<number | null>(null);
@@ -326,6 +329,35 @@ export class EmitirComponent {
       });
       this.emitido.set(c);
       this.auth.refrescar();
+    } catch (e) {
+      this.fallar(mensajeError(e));
+    } finally {
+      this.emitiendo.set(false);
+    }
+  }
+
+  /** Guarda el pedido como cotización (no va a SUNAT) y abre la cotización para compartirla. */
+  protected async guardarCotizacion() {
+    this.error.set(null);
+    if (!this.lineas().length) return this.fallar('Agrega al menos un producto, pe.');
+    const conCliente = this.clienteAbierto() && (this.numDoc.trim() || this.clienteId);
+    if (conCliente && !this.nombre.trim()) return this.fallar('Falta el nombre del cliente.');
+    this.emitiendo.set(true);
+    try {
+      const c = await this.api.post<{ id: number; numero: string }>('/cotizaciones', {
+        cliente: conCliente
+          ? { id: this.clienteId, tipoDocumento: this.tipoDoc, numeroDocumento: this.numDoc.trim(), nombre: this.nombre.trim(),
+              direccion: this.direccion.trim() || null, telefono: this.telefono.trim() || null, email: this.email.trim() || null }
+          : this.telefono.trim() || this.nombre.trim()
+            ? { nombre: this.nombre.trim() || null, telefono: this.telefono.trim() || null, email: this.email.trim() || null }
+            : null,
+        items: this.lineas().map((l) => ({ productoId: l.productoId, codigo: l.codigo, descripcion: l.descripcion, unidadMedida: l.unidadMedida,
+          cantidad: l.cantidad, precioUnitario: l.precio, tipoAfectacion: l.tipoAfectacion, icbper: l.icbper })),
+        diasValidez: 7,
+        observaciones: this.observaciones.trim() || null,
+      });
+      this.toast.ok(`Cotización ${c.numero} guardada`);
+      this.router.navigate(['/app/cotizaciones', c.id]);
     } catch (e) {
       this.fallar(mensajeError(e));
     } finally {

@@ -20,6 +20,17 @@ spring:
     enabled: true
     baseline-on-migrate: true
     baseline-version: 0
+  # Correo saliente para enviar comprobantes a los clientes. Sin MAIL_HOST no se envía nada.
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USER:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.connectiontimeout: 10000
+      mail.smtp.timeout: 10000
   jackson:
     time-zone: America/Lima
     default-property-inclusion: non_null
@@ -36,6 +47,8 @@ server:
 management:
   endpoints.web.exposure.include: health,info
   endpoint.health.show-details: never
+  # El correo es opcional: sin servidor configurado la API sigue «saludable».
+  health.mail.enabled: false
 
 springdoc:
   swagger-ui.path: /api/docs
@@ -57,6 +70,7 @@ altoque:
   # Mercado Pago para cobrar suscripciones (opcional).
   mercadopago-token: ${MP_ACCESS_TOKEN:}
   api-public-url: ${API_PUBLIC_URL:http://localhost:8080}
+  mail-from: ${MAIL_FROM:}
   # XML firmados y CDR (SUNAT exige conservarlos): en Docker es un volumen que hay que respaldar.
   archivos-dir: ${ARCHIVOS_DIR:./data/archivos}
   sunat:

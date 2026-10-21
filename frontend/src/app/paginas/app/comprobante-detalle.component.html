@@ -27,6 +27,7 @@
             <button type="button" class="btn btn-verde" (click)="whatsapp(c)"><at-icono nombre="whatsapp" /> WhatsApp</button>
             <button type="button" class="btn btn-amarillo" (click)="imprimir()"><at-icono nombre="imprimir" /> Imprimir</button>
             <button type="button" class="btn btn-borde" (click)="copiar(c)"><at-icono nombre="copiar" /> Copiar enlace</button>
+            <button type="button" class="btn btn-borde" (click)="enviarCorreo(c)"><at-icono nombre="enviar" /> Correo</button>
             <button type="button" class="btn btn-borde" (click)="descargar('xml')"><at-icono nombre="descargar" /> XML</button>
             @if (c.sunatCodigo && c.estadoSunat !== 'PENDIENTE' && c.emisor.ambiente !== 'SIMULADO') {
               <button type="button" class="btn btn-borde" (click)="descargar('cdr')"><at-icono nombre="descargar" /> CDR</button>

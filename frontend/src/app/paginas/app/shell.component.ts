@@ -96,9 +96,11 @@ export class ShellComponent {
   protected readonly enlaces = [
     { ruta: '/app', texto: 'Inicio', icono: 'inicio', admin: false },
     { ruta: '/app/comprobantes', texto: 'Comprobantes', icono: 'boleta', admin: false },
+    { ruta: '/app/cotizaciones', texto: 'Cotizaciones', icono: 'nota', admin: false },
     { ruta: '/app/clientes', texto: 'Clientes', icono: 'clientes', admin: false },
     { ruta: '/app/productos', texto: 'Productos', icono: 'caja', admin: false },
     { ruta: '/app/caja', texto: 'Caja del día', icono: 'dinero', admin: false },
+    { ruta: '/app/compras', texto: 'Compras e IGV', icono: 'grafico', admin: false },
     { ruta: '/app/reportes', texto: 'Reportes', icono: 'grafico', admin: false },
     { ruta: '/app/ajustes', texto: 'Ajustes', icono: 'ajustes', admin: false },
   ];

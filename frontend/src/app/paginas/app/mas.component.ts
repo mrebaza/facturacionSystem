@@ -33,6 +33,8 @@ export class MasComponent {
   protected auth = inject(Auth);
   protected readonly enlaces = [
     { ruta: '/app/negocios', texto: 'Mis negocios', icono: 'local', q: {} },
+    { ruta: '/app/cotizaciones', texto: 'Cotizaciones', icono: 'nota', q: {} },
+    { ruta: '/app/compras', texto: 'Compras e IGV del mes', icono: 'grafico', q: {} },
     { ruta: '/app/productos', texto: 'Productos', icono: 'caja', q: {} },
     { ruta: '/app/caja', texto: 'Caja del día', icono: 'dinero', q: {} },
     { ruta: '/app/reportes', texto: 'Reportes', icono: 'grafico', q: {} },

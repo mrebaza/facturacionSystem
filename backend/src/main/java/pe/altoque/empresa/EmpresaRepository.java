@@ -13,4 +13,9 @@ public interface EmpresaRepository extends JpaRepository<Empresa, Long> {
 
     @EntityGraph(attributePaths = "plan")
     Optional<Empresa> findWithPlanById(Long id);
+
+    /** Bloquea la fila de la empresa: numeraciones propias (cotizaciones) sin repetirse. */
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @org.springframework.data.jpa.repository.Query("select e from Empresa e where e.id = :id")
+    Optional<Empresa> bloquear(Long id);
 }

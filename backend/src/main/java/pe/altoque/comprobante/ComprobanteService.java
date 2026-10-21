@@ -123,6 +123,26 @@ public class ComprobanteService {
         return c;
     }
 
+    /**
+     * Calcula líneas y totales como en una venta, sin emitir ni guardar nada: lo usan las cotizaciones para que sus
+     * montos salgan con las mismas reglas (IGV, ICBPER, afectación) que tendrá el comprobante.
+     */
+    @Transactional(readOnly = true)
+    public Comprobante presupuesto(Long empresaId, List<ItemIn> items) {
+        Empresa empresa = empresas.findById(empresaId).orElseThrow(() -> ApiException.noEncontrado("Empresa"));
+        Comprobante c = new Comprobante();
+        c.setEmpresa(empresa);
+        c.setIgvPorcentaje(empresa.getIgvPorcentaje());
+        Map<Long, Producto> porId = cargarProductos(empresaId, items);
+        int n = 1;
+        for (ItemIn it : items) {
+            Producto p = it.productoId() != null ? porId.get(it.productoId()) : null;
+            c.agregarDetalle(linea(n++, it, p, empresa.getIgvPorcentaje()));
+        }
+        Calculadora.totalizar(c);
+        return c;
+    }
+
     private void aplicarDetraccion(Comprobante c, DetraccionIn in) {
         if (c.getTipo() != TipoComprobante.FACTURA) throw ApiException.invalido("La detracción solo va en facturas.");
         if (c.getTotal().compareTo(MINIMO_DETRACCION) <= 0) {

@@ -17,7 +17,8 @@ public record AltoqueProperties(
         String mercadopagoToken,
         String apiPublicUrl,
         String archivosDir,
-        Sunat sunat
+        Sunat sunat,
+        String mailFrom
 ) {
     public record Sunat(String betaFacturaUrl, String produccionFacturaUrl, String produccionConsultaUrl, int timeoutSegundos,
                         String reintentoCron) {}

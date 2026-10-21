@@ -253,6 +253,9 @@
           <button type="button" class="btn btn-tinta btn-grande btn-bloque" [disabled]="emitiendo()" (click)="emitir()">
             @if (emitiendo()) { Emitiendo… } @else { <at-icono nombre="enviar" /> Emitir {{ tipo() === '01' ? 'factura' : 'boleta' }} · {{ totales().total | soles }} }
           </button>
+          <button type="button" class="btn btn-borde btn-bloque" [class.btn-tinta]="modoCotizacion" [disabled]="emitiendo()" (click)="guardarCotizacion()">
+            <at-icono nombre="nota" /> Guardar como cotización
+          </button>
         }
       </div>
     </section>

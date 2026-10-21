@@ -138,6 +138,19 @@ export class ComprobanteDetalleComponent {
     compartirWhatsapp(c);
   }
 
+  /** Envía el comprobante (con su XML y CDR) al correo del cliente, o al que se escriba. */
+  protected async enviarCorreo(c: Comprobante) {
+    const email = prompt('¿A qué correo lo enviamos?', c.clienteEmail ?? '');
+    if (email === null) return;
+    try {
+      const r = await this.api.post<{ enviado: boolean; email: string | null; motivo: string | null }>(`/comprobantes/${c.id}/correo`, { email: email.trim() || null });
+      if (r.enviado) this.toast.ok(`Enviado a ${r.email}`);
+      else this.toast.error(r.motivo ?? 'No se pudo enviar.');
+    } catch (e) {
+      this.toast.error(mensajeError(e));
+    }
+  }
+
   protected async copiar(c: Comprobante) {
     if (await copiarEnlace(c)) this.toast.ok('Enlace copiado. Pégalo donde quieras.');
     else this.toast.error('No se pudo copiar el enlace.');
